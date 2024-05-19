@@ -20,7 +20,7 @@ main {
     gap: 1rem;
 }
 
-input {
+span {
     grid-column: span 4;
     text-align: right;
     background-color: #4d4d4d;
@@ -30,8 +30,8 @@ input {
     border-radius: 0.5rem; 
 }
 
-input.answer {
-    font-size: 3rem; 
-    height: 7rem; 
-    line-height: 3rem; 
+span.answer {
+    font-size: 4rem; 
+    height: 5rem; 
+    line-height: 5rem; 
 }
