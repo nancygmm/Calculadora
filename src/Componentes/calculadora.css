@@ -1,0 +1,19 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+main {
+    background-color: #F1F2F3;
+    aspect-ratio: 9 / 16;
+    border-radius: 40px;
+    height: 90%;
+    min-height: 600px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.20);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
