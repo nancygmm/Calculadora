@@ -1,0 +1,25 @@
+button {
+    border: none;
+    border-radius: 10.5rem;
+    background-color: blue;
+    font-size: 2rem;
+    aspect-ratio: 1/1;
+}
+
+button.active {
+    transform: scale(1.02);
+}
+
+button.gris {
+    background-color: rgb(150, 150, 255);
+}
+
+button.operacion {
+    background-color: rgb(171, 87, 255);
+}
+
+button.cero {
+    background-color: blue;
+    grid-column: span 2; 
+    aspect-ratio: 2/0.92;
+}
