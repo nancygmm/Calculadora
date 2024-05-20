@@ -8,18 +8,25 @@ const Calculadora = () => {
     const escritura = (event) => {
         if (data.resultado.length >= 9) return;
 
-        if (data.resultado !== '') {
-            // Si hay un resultado anterior, establecer el nuevo número como el primer número de la próxima operación
-            setData({ ...data, resultado: '', primerNumero: event.target.innerText, segundoNumero: '', operador: '' });
-        } else if (data.operacion === '') {
-            setData({ ...data, primerNumero: data.primerNumero + event.target.innerText });
-        } else {
+        if (data.operador) {
             setData({ ...data, segundoNumero: data.segundoNumero + event.target.innerText });
+        } else {
+            if (data.resultado !== '' && data.primerNumero === data.resultado) {
+                setData({ ...data, primerNumero: event.target.innerText, segundoNumero: '', resultado: '', operador: '' });
+            } else {
+                setData({ ...data, primerNumero: data.primerNumero + event.target.innerText });
+            }
         }
     };
 
     const borrarUno = () => {
-        setData({ ...data, resultado: data.resultado.slice(0, -1), numeroActual: data.numeroActual.slice(0, -1) });
+        if (data.segundoNumero !== '') {
+            setData({ ...data, segundoNumero: data.segundoNumero.slice(0, -1) });
+        } else if (data.operador !== '') {
+            setData({ ...data, operador: '' });
+        } else {
+            setData({ ...data, primerNumero: data.primerNumero.slice(0, -1) });
+        }
     };
 
     const borrarTodo = () => {
@@ -29,21 +36,24 @@ const Calculadora = () => {
     const calcular = () => {
         let resultado = 0;
         const primerNum = parseFloat(data.primerNumero);
-        const segundoNum = parseFloat(data.segundoNumero || data.resultado); // Usamos el resultado si no hay segundo número
-    
+        const segundoNum = parseFloat(data.segundoNumero || data.resultado); 
+
         switch (data.operador) {
             case '+':
                 resultado = primerNum + segundoNum;
                 break;
             case '-':
                 resultado = primerNum - segundoNum;
+                if (resultado < 0) {
+                    setData({ resultado: 'Error', operacion: '', primerNumero: '', segundoNumero: '', operador: '' });
+                    return;
+                }
                 break;
             case '*':
                 resultado = primerNum * segundoNum;
                 break;
             case '/':
                 if (segundoNum === 0) {
-                    // Manejar división por cero
                     setData({ resultado: 'Error', operacion: '', primerNumero: '', segundoNumero: '', operador: '' });
                     return;
                 }
@@ -52,20 +62,22 @@ const Calculadora = () => {
             default:
                 resultado = 0;
         }
-    
+
         setData({ ...data, resultado: resultado.toString(), primerNumero: resultado.toString(), segundoNumero: '', operador: '' });
     };
-    
 
     const agregarOperacion = (operacion) => {
-        if (data.primerNumero !== '' && data.operador === '') {
-            setData({ ...data, operador: operacion, operacion: data.primerNumero + operacion });
+        if (data.primerNumero !== '' && data.segundoNumero === '') {
+            setData({ ...data, operador: operacion });
+        } else if (data.segundoNumero !== '') {
+            calcular(); 
+            setData(prevData => ({ ...prevData, operador: operacion, segundoNumero: '' })); 
         }
     };
 
     return (
         <main>
-            <span className='answer'>{data.resultado || data.segundoNumero || data.primerNumero}</span>
+            <span className='answer'>{data.resultado === 'Error' ? 'Error' : (data.segundoNumero || data.primerNumero)}</span>
             <Boton texto='AC' clase='gris' handleCLick={borrarTodo} />
             <Boton texto='C' clase='gris' handleCLick={borrarUno} />
             <Boton texto='+/-' clase='gris' />
