@@ -9,12 +9,12 @@ const Calculadora = () => {
         if (data.resultado.length >= 9) return;
 
         if (data.operador) {
-            setData({ ...data, segundoNumero: data.segundoNumero + event.target.innerText });
+            setData({ ...data, segundoNumero: (data.segundoNumero + event.target.innerText).slice(0, 9) });
         } else {
             if (data.resultado !== '' && data.primerNumero === data.resultado) {
                 setData({ ...data, primerNumero: event.target.innerText, segundoNumero: '', resultado: '', operador: '' });
             } else {
-                setData({ ...data, primerNumero: data.primerNumero + event.target.innerText });
+                setData({ ...data, primerNumero: (data.primerNumero + event.target.innerText).slice(0, 9) });
             }
         }
     };
@@ -31,6 +31,16 @@ const Calculadora = () => {
 
     const borrarTodo = () => {
         setData({ resultado: '', operacion: '', primerNumero: '', segundoNumero: '', operador: '' });
+    };
+
+    const cambiarSigno = () => {
+        if (data.segundoNumero !== '') {
+            setData({ ...data, segundoNumero: (parseFloat(data.segundoNumero) * -1).toString() });
+        } else if (data.operador !== '') {
+            setData({ ...data, resultado: (parseFloat(data.resultado) * -1).toString(), primerNumero: (parseFloat(data.primerNumero) * -1).toString() });
+        } else {
+            setData({ ...data, primerNumero: (parseFloat(data.primerNumero) * -1).toString() });
+        }
     };
 
     const calcular = () => {
@@ -51,9 +61,13 @@ const Calculadora = () => {
                 break;
             case '*':
                 resultado = primerNum * segundoNum;
+                if (resultado < 0) {
+                    setData({ resultado: 'Error', operacion: '', primerNumero: '', segundoNumero: '', operador: '' });
+                    return;
+                }
                 break;
             case '/':
-                if (segundoNum === 0) {
+                if (segundoNum === 0 || primerNum / segundoNum < 0) {
                     setData({ resultado: 'Error', operacion: '', primerNumero: '', segundoNumero: '', operador: '' });
                     return;
                 }
@@ -63,7 +77,12 @@ const Calculadora = () => {
                 resultado = 0;
         }
 
-        setData({ ...data, resultado: resultado.toString(), primerNumero: resultado.toString(), segundoNumero: '', operador: '' });
+        if (resultado > 999999999) {
+            setData({ resultado: 'Error', operacion: '', primerNumero: '', segundoNumero: '', operador: '' });
+        } else {
+            resultado = parseFloat(resultado.toFixed(9 - (resultado.toString().split('.')[0].length + 1)));
+            setData({ ...data, resultado: resultado.toString(), primerNumero: resultado.toString(), segundoNumero: '', operador: '' });
+        }
     };
 
     const agregarOperacion = (operacion) => {
@@ -80,7 +99,7 @@ const Calculadora = () => {
             <span className='answer'>{data.resultado === 'Error' ? 'Error' : (data.segundoNumero || data.primerNumero)}</span>
             <Boton texto='AC' clase='gris' handleCLick={borrarTodo} />
             <Boton texto='C' clase='gris' handleCLick={borrarUno} />
-            <Boton texto='+/-' clase='gris' />
+            <Boton texto='+/-' clase='gris' handleCLick={cambiarSigno} />
             <Boton texto='/' clase='operacion' handleCLick={() => agregarOperacion('/')} />
             <Boton texto='7' clase='numero' handleCLick={escritura} />
             <Boton texto='8' clase='numero' handleCLick={escritura} />
@@ -96,7 +115,7 @@ const Calculadora = () => {
             <Boton texto='+' clase='operacion' handleCLick={() => agregarOperacion('+')} />
             <Boton texto='0' clase='numero' handleCLick={escritura} />
             <Boton texto='%' clase='numero' />
-            <Boton texto='.' clase='numero' />
+            <Boton texto='.' clase='numero' handleCLick={escritura} />
             <Boton texto='=' clase='operacion' handleCLick={calcular} />
         </main>
     );
